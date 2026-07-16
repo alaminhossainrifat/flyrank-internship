@@ -31,5 +31,19 @@ public class TaskService {
         );
         return repository.save(task);
     }
+
+    public Task update(Long id, com.flyrank.crudapi.dto.TaskRequest request) {
+        Task existing = findById(id); // 404 if missing
+        existing.setTitle(request.getTitle());
+        existing.setDone(request.getDone() != null ? request.getDone() : existing.isDone());
+        return repository.save(existing);
+    }
+
+    public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new TaskNotFoundException(id);
+        }
+        repository.deleteById(id);
+    }
 }
 

@@ -37,4 +37,17 @@ public class TaskController {
         Task created = service.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
+
+    // PUT /tasks/{id} - replace title/done, 404 if missing, 400 if invalid body.
+    @PutMapping("/{id}")
+    public Task update(@PathVariable Long id, @Valid @RequestBody TaskRequest request) {
+        return service.update(id, request);
+    }
+
+    // DELETE /tasks/{id} - remove task, 204 on success, 404 if missing.
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }
