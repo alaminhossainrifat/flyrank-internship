@@ -22,5 +22,14 @@ public class TaskService {
         return repository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(id));
     }
+
+    public Task create(com.flyrank.crudapi.dto.TaskRequest request) {
+        Task task = new Task(
+                repository.nextId(),
+                request.getTitle(),
+                request.getDone() != null && request.getDone()
+        );
+        return repository.save(task);
+    }
 }
 

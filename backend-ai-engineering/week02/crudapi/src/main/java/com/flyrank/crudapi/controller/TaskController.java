@@ -1,12 +1,13 @@
 package com.flyrank.crudapi.controller;
 
+import com.flyrank.crudapi.dto.TaskRequest;
 import com.flyrank.crudapi.model.Task;
 import com.flyrank.crudapi.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,5 +29,12 @@ public class TaskController {
     @GetMapping("/{id}")
     public Task getOne(@PathVariable Long id) {
         return service.findById(id);
+    }
+
+    // POST /tasks - create task, 201, 400 if title invalid.
+    @PostMapping
+    public ResponseEntity<Task> create(@Valid @RequestBody TaskRequest request) {
+        Task created = service.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 }
