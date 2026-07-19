@@ -10,41 +10,39 @@ import java.util.List;
 @RequestMapping("/tasks")
 public class TaskController {
 
-    private final TaskService taskService;
+    private final TaskService service;
 
-    public TaskController(TaskService taskService) {
-        this.taskService = taskService;
+    public TaskController(TaskService service) {
+        this.service = service;
     }
 
     @GetMapping
     public List<Task> getAllTasks() {
-        return taskService.getAllTasks();
+        return service.getAllTasks();
     }
 
     @GetMapping("/{id}")
     public Task getTask(@PathVariable Long id) {
-        return taskService.getTaskById(id);
+        return service.getTaskById(id);
     }
 
     @PostMapping
     public Task createTask(@RequestBody Task task) {
-        return taskService.createTask(task);
+        return service.createTask(task);
     }
 
     @PutMapping("/{id}")
     public Task updateTask(@PathVariable Long id,
                            @RequestBody Task task) {
-        return taskService.updateTask(id, task);
+        return service.updateTask(id, task);
     }
 
     @DeleteMapping("/{id}")
     public String deleteTask(@PathVariable Long id) {
 
-        if (taskService.deleteTask(id)) {
-            return "Task deleted successfully.";
-        }
+        service.deleteTask(id);
 
-        return "Task not found.";
+        return "Task deleted successfully.";
     }
 
 }

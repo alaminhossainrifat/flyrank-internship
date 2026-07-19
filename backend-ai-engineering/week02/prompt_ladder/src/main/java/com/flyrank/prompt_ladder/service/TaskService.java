@@ -2,52 +2,47 @@ package com.flyrank.prompt_ladder.service;
 
 import com.flyrank.prompt_ladder.model.Task;
 import org.springframework.stereotype.Service;
+import com.flyrank.prompt_ladder.repository.TaskRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class TaskService {
 
-    private final List<Task> tasks = new ArrayList<>();
+    private final TaskRepository repository;
 
-    public TaskService() {
-        tasks.add(new Task(1L, "Learn Spring Boot", false));
-        tasks.add(new Task(2L, "Build REST API", true));
+    public TaskService(TaskRepository repository) {
+        this.repository = repository;
     }
 
     public List<Task> getAllTasks() {
-        return tasks;
+        return repository.findAll();
     }
 
     public Task getTaskById(Long id) {
-        return tasks.stream()
-                .filter(task -> task.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        return repository.findById(id).orElse(null);
     }
 
     public Task createTask(Task task) {
-        task.setId((long) (tasks.size() + 1));
-        tasks.add(task);
-        return task;
+        return repository.save(task);
     }
 
-    public Task updateTask(Long id, Task updatedTask) {
+    public Task updateTask(Long id, Task task) {
 
-        for (Task task : tasks) {
-            if (task.getId().equals(id)) {
-                task.setTitle(updatedTask.getTitle());
-                task.setCompleted(updatedTask.isCompleted());
-                return task;
-            }
+        Task existingTask = repository.findById(id).orElse(null);
+
+        if (existingTask == null) {
+            return null;
         }
 
-        return null;
+        existingTask.setTitle(task.getTitle());
+        existingTask.setCompleted(task.isCompleted());
+
+        return repository.save(existingTask);
     }
 
-    public boolean deleteTask(Long id) {
-        return tasks.removeIf(task -> task.getId().equals(id));
+    public void deleteTask(Long id) {
+        repository.deleteById(id);
     }
 
 
