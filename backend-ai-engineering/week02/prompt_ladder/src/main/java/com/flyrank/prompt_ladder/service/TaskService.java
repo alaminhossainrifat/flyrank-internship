@@ -9,23 +9,29 @@ import java.util.List;
 @Service
 public class TaskService {
 
+    // Repository dependency
     private final TaskRepository repository;
 
     public TaskService(TaskRepository repository) {
         this.repository = repository;
     }
 
+    // Retrieve all tasks
     public List<Task> getAllTasks() {
         return repository.findAll();
     }
 
+    // Retrieve a task by ID
     public Task getTaskById(Long id) {
         return repository.findById(id).orElse(null);
     }
 
+    // Create a new task
     public Task createTask(Task task) {
         return repository.save(task);
     }
+
+    // Update an existing task
 
     public Task updateTask(Long id, Task task) {
 
@@ -41,6 +47,7 @@ public class TaskService {
         return repository.save(existingTask);
     }
 
+    // Delete a task by ID
     public void deleteTask(Long id) {
         repository.deleteById(id);
     }

@@ -2,16 +2,24 @@ package com.flyrank.prompt_ladder.model;
 
 import jakarta.persistence.*;
 
+/*
+ * Entity class representing a Task.
+ * Mapped to the "tasks" table in the database.
+ */
+
 @Entity
 @Table(name = "tasks")
 public class Task {
 
+    // Primary key with auto-generated value
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Task title
     private String title;
 
+    // Task completion status
     private boolean completed;
 
     public Task() {
@@ -21,6 +29,8 @@ public class Task {
         this.title = title;
         this.completed = completed;
     }
+
+    // Getters and Setters
 
     public Long getId() {
         return id;
