@@ -1,6 +1,7 @@
 package com.flyrank.prompt_ladder.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 /*
  * Entity class representing a Task.
@@ -17,6 +18,7 @@ public class Task {
     private Long id;
 
     // Task title
+    @NotBlank(message = "Title is required")
     private String title;
 
     // Task completion status

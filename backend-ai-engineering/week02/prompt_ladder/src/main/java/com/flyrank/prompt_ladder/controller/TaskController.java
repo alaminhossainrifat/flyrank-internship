@@ -2,6 +2,9 @@ package com.flyrank.prompt_ladder.controller;
 
 import com.flyrank.prompt_ladder.model.Task;
 import com.flyrank.prompt_ladder.service.TaskService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,28 +28,34 @@ public class TaskController {
 
     // GET /tasks/{id}
     @GetMapping("/{id}")
-    public Task getTask(@PathVariable Long id) {
-        return service.getTaskById(id);
+    public ResponseEntity<Task> getTask(@PathVariable Long id) {
+        Task task = service.getTaskById(id);
+        return ResponseEntity.ok(task);
     }
 
     // POST /tasks
     @PostMapping
-    public Task createTask(@RequestBody Task task) {
-        return service.createTask(task);
+    public ResponseEntity<Task> createTask(@Valid @RequestBody Task task) {
+        Task savedTask = service.createTask(task);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedTask);
     }
 
     // PUT /tasks/{id}
     @PutMapping("/{id}")
-    public Task updateTask(@PathVariable Long id,
-                           @RequestBody Task task) {
-        return service.updateTask(id, task);
+    public ResponseEntity<Task> updateTask(@PathVariable Long id,
+                                           @Valid @RequestBody Task task) {
+
+        Task updatedTask = service.updateTask(id, task);
+        return ResponseEntity.ok(updatedTask);
     }
 
     // DELETE /tasks/{id}
     @DeleteMapping("/{id}")
-    public String deleteTask(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+
         service.deleteTask(id);
-        return "Task deleted successfully.";
+
+        return ResponseEntity.noContent().build();
     }
 
 
