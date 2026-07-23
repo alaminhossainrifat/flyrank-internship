@@ -38,8 +38,9 @@ public class SupabaseAuthService {
 
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-            JsonNode root = objectMapper.readTree(response.getBody());
-            return ResponseEntity.status(HttpStatus.CREATED).body(root);
+            // Parse raw JSON string to Java Object to avoid Jackson JsonNode serialization bug
+            Object jsonResponse = objectMapper.readValue(response.getBody(), Object.class);
+            return ResponseEntity.status(HttpStatus.CREATED).body(jsonResponse);
         } catch (HttpClientErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
         } catch (Exception e) {
@@ -60,8 +61,9 @@ public class SupabaseAuthService {
 
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-            JsonNode root = objectMapper.readTree(response.getBody());
-            return ResponseEntity.ok(root);
+            // Parse raw JSON string to Java Object to avoid Jackson JsonNode serialization bug
+            Object jsonResponse = objectMapper.readValue(response.getBody(), Object.class);
+            return ResponseEntity.ok(jsonResponse);
         } catch (HttpClientErrorException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid login credentials"));
