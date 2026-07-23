@@ -1,6 +1,5 @@
 package com.flyrank.auth_service.security;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flyrank.auth_service.dto.ErrorResponse;
 import com.flyrank.auth_service.service.SupabaseAuthService;
@@ -57,14 +56,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        JsonNode userJson = authService.verifyTokenAndGetUser(token);
-        if (userJson == null) {
+        Object userObj = authService.verifyTokenAndGetUser(token);
+        if (userObj == null) {
             sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "Invalid or expired token");
             return;
         }
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                userJson, token, Collections.emptyList());
+                userObj, token, Collections.emptyList());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);

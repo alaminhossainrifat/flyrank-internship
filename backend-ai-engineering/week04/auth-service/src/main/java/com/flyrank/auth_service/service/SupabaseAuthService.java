@@ -1,6 +1,5 @@
 package com.flyrank.auth_service.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -38,7 +37,6 @@ public class SupabaseAuthService {
 
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-            // Parse raw JSON string to Java Object to avoid Jackson JsonNode serialization bug
             Object jsonResponse = objectMapper.readValue(response.getBody(), Object.class);
             return ResponseEntity.status(HttpStatus.CREATED).body(jsonResponse);
         } catch (HttpClientErrorException e) {
@@ -61,7 +59,6 @@ public class SupabaseAuthService {
 
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-            // Parse raw JSON string to Java Object to avoid Jackson JsonNode serialization bug
             Object jsonResponse = objectMapper.readValue(response.getBody(), Object.class);
             return ResponseEntity.ok(jsonResponse);
         } catch (HttpClientErrorException e) {
@@ -73,14 +70,7 @@ public class SupabaseAuthService {
         }
     }
 
-    private HttpHeaders createHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("apikey", supabaseKey);
-        return headers;
-    }
-
-    public JsonNode verifyTokenAndGetUser(String token) {
+    public Object verifyTokenAndGetUser(String token) {
         String url = supabaseUrl + "/auth/v1/user";
         HttpHeaders headers = createHeaders();
         headers.setBearerAuth(token);
@@ -89,7 +79,7 @@ public class SupabaseAuthService {
 
         try {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
-            return objectMapper.readTree(response.getBody());
+            return objectMapper.readValue(response.getBody(), Object.class);
         } catch (Exception e) {
             return null;
         }
@@ -108,5 +98,12 @@ public class SupabaseAuthService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private HttpHeaders createHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("apikey", supabaseKey);
+        return headers;
     }
 }
