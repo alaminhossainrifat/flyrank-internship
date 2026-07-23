@@ -77,4 +77,19 @@ public class SupabaseAuthService {
         headers.set("apikey", supabaseKey);
         return headers;
     }
+
+    public JsonNode verifyTokenAndGetUser(String token) {
+        String url = supabaseUrl + "/auth/v1/user";
+        HttpHeaders headers = createHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+            return objectMapper.readTree(response.getBody());
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
