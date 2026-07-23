@@ -92,4 +92,19 @@ public class SupabaseAuthService {
             return null;
         }
     }
+
+    public boolean logout(String token) {
+        String url = supabaseUrl + "/auth/v1/logout";
+        HttpHeaders headers = createHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        try {
+            restTemplate.postForEntity(url, request, String.class);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

@@ -41,4 +41,13 @@ public class AuthController {
     private boolean isNullOrEmpty(String str) {
         return str == null || str.trim().isEmpty();
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(org.springframework.security.core.Authentication authentication) {
+        if (authentication != null && authentication.getCredentials() != null) {
+            String token = (String) authentication.getCredentials();
+            authService.logout(token);
+        }
+        return ResponseEntity.noContent().build();
+    }
 }
