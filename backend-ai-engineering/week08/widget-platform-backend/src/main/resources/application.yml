@@ -1,12 +1,32 @@
+#spring:
+#  config:
+#    import: optional:file:.env
+#  application:
+#    name: widget-platform-backend
+#  datasource:
+#    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:widget_platform}
+#    username: ${DB_USER:postgres}
+#    password: ${DB_PASS:root}
+#    driver-class-name: org.postgresql.Driver
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
+#        dialect: org.hibernate.dialect.PostgreSQLDialect
+#
+#server:
+#  port: 8080
+
 spring:
-  config:
-    import: optional:file:.env
   application:
     name: widget-platform-backend
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:widget_platform}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASS:root}
+    url: jdbc:postgresql://localhost:5432/widget_platform
+    username: postgres
+    password: Alaminhossainrifat@015
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
