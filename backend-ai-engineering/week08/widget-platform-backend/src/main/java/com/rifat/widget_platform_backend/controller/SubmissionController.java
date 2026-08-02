@@ -19,11 +19,16 @@ public class SubmissionController {
     private final WidgetService widgetService;
 
     @PostMapping
-    public ResponseEntity<Submission> submitForm(
+    public ResponseEntity<?> submitForm(
             @RequestBody Map<String, Object> payload,
             @RequestParam UUID widgetId) {
 
-        // Basic saving logic. CORS, validation, and rate limiting will be applied later.
+        // Honeypot Spam Protection: bots usually fill all fields, including hidden ones
+        if (payload.containsKey("_bot_check") && !payload.get("_bot_check").toString().isEmpty()) {
+            // Silently drop the request and return 200 OK to trick the bot
+            return ResponseEntity.ok(Map.of("status", "success", "message", "Submission received"));
+        }
+
         Submission submission = new Submission();
         submission.setWidget(widgetService.getWidgetById(widgetId));
         submission.setPayload(payload);
