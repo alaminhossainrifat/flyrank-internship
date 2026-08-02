@@ -3,6 +3,7 @@ package com.rifat.widget_platform_backend.controller;
 import com.rifat.widget_platform_backend.entity.Submission;
 import com.rifat.widget_platform_backend.repository.SubmissionRepository;
 import com.rifat.widget_platform_backend.service.GeoEnrichmentService;
+import com.rifat.widget_platform_backend.service.NotificationService;
 import com.rifat.widget_platform_backend.service.WidgetService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,34 +21,42 @@ public class SubmissionController {
     private final SubmissionRepository submissionRepository;
     private final WidgetService widgetService;
     private final GeoEnrichmentService geoEnrichmentService;
+    private final NotificationService notificationService; // Injected notification service
 
     @PostMapping
     public ResponseEntity<?> submitForm(
             @RequestBody Map<String, Object> payload,
             @RequestParam UUID widgetId,
-            HttpServletRequest request) { // HttpServletRequest added to capture IP address
+            HttpServletRequest request) {
 
-        // 1. Honeypot Spam Protection
+        // Honeypot spam protection check
         if (payload.containsKey("_bot_check") && !payload.get("_bot_check").toString().isEmpty()) {
             return ResponseEntity.ok(Map.of("status", "success", "message", "Submission received"));
         }
 
-        // 2. IP Address Find
+        // Extract client IP address
         String ipAddress = request.getHeader("X-Forwarded-For");
         if (ipAddress == null || ipAddress.isEmpty()) {
             ipAddress = request.getRemoteAddr();
         }
 
-        // 3. Call Geo Enrichment
+        // Fetch location data using the IP address
         Map<String, Object> geoData = geoEnrichmentService.getGeoData(ipAddress);
 
-        // 4. Data Save
         Submission submission = new Submission();
-        submission.setWidget(widgetService.getWidgetById(widgetId));
+        var widget = widgetService.getWidgetById(widgetId); // Store widget reference
+
+        submission.setWidget(widget);
         submission.setPayload(payload);
         submission.setIpAddress(ipAddress);
-        submission.setGeoLocation(geoData); // Location data saved (no problem even if null)
+        submission.setGeoLocation(geoData);
 
-        return ResponseEntity.ok(submissionRepository.save(submission));
+        // 1. Main Path: Save submission to the database
+        Submission savedSubmission = submissionRepository.save(submission);
+
+        // 2. Safe Side Effect: Trigger email notification asynchronously or handled safely
+        notificationService.sendEmailNotification(widget.getName());
+
+        return ResponseEntity.ok(savedSubmission);
     }
 }
