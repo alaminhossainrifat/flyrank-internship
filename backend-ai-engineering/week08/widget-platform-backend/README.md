@@ -1,54 +1,88 @@
 # 🚀 Widget Platform Backend
 
-> A multi-tenant embeddable widget and lead-capture platform built with Spring Boot and PostgreSQL.
+<div align="center">
 
-![Java](https://img.shields.io/badge/Java-25-orange)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1-green)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue)
-![License](https://img.shields.io/badge/License-MIT-lightgrey)
+### Multi-Tenant Embeddable Widget & Lead-Capture Platform
+
+A scalable backend application built with **Java 25**, **Spring Boot 4.1**, and **PostgreSQL** for creating embeddable widgets, collecting customer submissions, and providing secure dashboard analytics.
+
+![Java](https://img.shields.io/badge/Java-25-orange?style=for-the-badge&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1-6DB33F?style=for-the-badge&logo=springboot)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?style=for-the-badge&logo=postgresql)
+![Hibernate](https://img.shields.io/badge/Hibernate-ORM-59666C?style=for-the-badge)
+![Maven](https://img.shields.io/badge/Maven-Build-red?style=for-the-badge&logo=apachemaven)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+
+</div>
 
 ---
 
-## 📌 Project Overview
+# 📖 Project Overview
 
-Widget Platform Backend is a RESTful API that allows businesses to create embeddable widgets, collect customer submissions, and manage leads securely.
+Widget Platform Backend is a production-oriented REST API designed for businesses that need to embed customizable widgets into their websites and securely collect customer information.
 
-The platform is designed with **multi-tenant architecture**, allowing each owner to access only their own widgets and submissions.
+The application follows a **multi-tenant architecture**, ensuring complete isolation between organizations while providing a scalable backend for widget delivery, lead capture, analytics, spam protection, and future authentication.
+
+---
+
+# 📑 Table of Contents
+
+- Features
+- Tech Stack
+- Project Structure
+- Database Schema
+- Architecture
+- Configuration
+- Getting Started
+- REST API
+- Security
+- Development Progress
+- Roadmap
+- Future Improvements
+- License
+- Author
 
 ---
 
 # ✨ Features
 
-- ✅ Create embeddable widgets
-- ✅ Multi-tenant architecture
-- ✅ Lead submission API
-- ✅ PostgreSQL database
+- ✅ Embeddable Widget Management
+- ✅ Multi-Tenant Architecture
+- ✅ Widget Delivery API
+- ✅ Lead Submission API
+- ✅ Dashboard Analytics API
+- ✅ PostgreSQL Integration
 - ✅ Hibernate ORM
 - ✅ Spring Data JPA
 - ✅ Layered Architecture
-- ✅ REST API
-- ✅ JSONB Support
+- ✅ RESTful APIs
 - ✅ UUID Primary Keys
+- ✅ JSONB Payload Storage
+- ✅ JSONB Geo Location Storage
 - ✅ Geo-Enrichment (IP → Location)
 - ✅ Safe Side Effects (Resilient Email Notifications)
+- ✅ Global Exception Handling
+- ✅ Request Validation
 - ✅ CORS Protection
 - ✅ Rate Limiting
 - ✅ Honeypot Spam Protection
-- ✅ Future-ready for Authentication & JWT
+- ✅ Dashboard-ready Data
+- ✅ Future-ready JWT Authentication
 
 ---
 
 # 🛠 Tech Stack
 
-| Technology | Version |
-|------------|----------|
-| Java | 25 |
-| Spring Boot | 4.1 |
-| Spring Data JPA | Latest |
-| Hibernate | 7.x |
-| PostgreSQL | 17 |
-| Maven | Latest |
-| Lombok | Latest |
+| Category | Technology |
+|------------|------------|
+| Language | Java 25 |
+| Framework | Spring Boot 4.1 |
+| ORM | Hibernate 7 |
+| Database | PostgreSQL 17 |
+| Build Tool | Maven |
+| Persistence | Spring Data JPA |
+| Boilerplate | Lombok |
+| Security | Spring Security |
 
 ---
 
@@ -56,74 +90,38 @@ The platform is designed with **multi-tenant architecture**, allowing each owner
 
 ```text
 widget-platform-backend/
+│
+├── demo-website/
+│   └── index.html
+│
 ├── src/
 │   ├── main/
 │   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── rifat/
-│   │   │           └── widget_platform_backend/
-│   │   │               ├── config/
-│   │   │               │   └── SecurityConfig.java
-│   │   │               ├── controller/
-│   │   │               │   ├── DeliveryController.java
-│   │   │               │   ├── SubmissionController.java
-│   │   │               │   └── WidgetController.java
-│   │   │               ├── entity/
-│   │   │               │   ├── Submission.java
-│   │   │               │   └── Widget.java
-│   │   │               ├── filter/
-│   │   │               │   └── RateLimitFilter.java
-│   │   │               ├── repository/
-│   │   │               │   ├── SubmissionRepository.java
-│   │   │               │   └── WidgetRepository.java
-│   │   │               ├── service/
-│   │   │               │   ├── GeoEnrichmentService.java
-│   │   │               │   ├── NotificationService.java
-│   │   │               │   └── WidgetService.java
-│   │   │               └── WidgetPlatformBackendApplication.java
-│   │   └── resources/
-│   │       ├── static/
-│   │       ├── templates/
-│   │       └── application.yml
-│   └── test/
-│       └── java/
-│           └── com/
-│               └── rifat/
-│                   └── widget_platform_backend/
-│                       └── WidgetPlatformBackendApplicationTests.java
-├── target/
-│   ├── classes/
-│   │   ├── com/
-│   │   │   └── rifat/
-│   │   │       └── widget_platform_backend/
-│   │   │           ├── config/
-│   │   │           │   └── SecurityConfig.class
-│   │   │           ├── controller/
-│   │   │           │   ├── DeliveryController.class
-│   │   │           │   ├── SubmissionController.class
-│   │   │           │   └── WidgetController.class
-│   │   │           ├── entity/
-│   │   │           │   ├── Submission.class
-│   │   │           │   └── Widget.class
-│   │   │           ├── filter/
-│   │   │           │   └── RateLimitFilter.class
-│   │   │           ├── repository/
-│   │   │           │   ├── SubmissionRepository.class
-│   │   │           │   └── WidgetRepository.class
-│   │   │           ├── service/
-│   │   │           │   ├── GeoEnrichmentService.class
-│   │   │           │   ├── NotificationService.class
-│   │   │           │   └── WidgetService.class
-│   │   │           └── WidgetPlatformBackendApplication.class
-│   │   └── application.yml
-│   └── generated-sources/
-│       └── annotations/
+│   │   │
+│   │   └── com/rifat/widget_platform_backend/
+│   │       ├── config/
+│   │       ├── controller/
+│   │       ├── entity/
+│   │       ├── exception/
+│   │       ├── filter/
+│   │       ├── repository/
+│   │       ├── service/
+│   │       └── WidgetPlatformBackendApplication.java
+│   │
+│   └── resources/
+│       ├── static/
+│       │   └── widget.js
+│       ├── templates/
+│       └── application.yml
+│
+├── BUILDLOG.md
+├── capstone.yaml
+├── EVIDENCE.md
 ├── HELP.md
 ├── README.md
 ├── mvnw
 ├── mvnw.cmd
 └── pom.xml
-
 ```
 
 ---
@@ -156,9 +154,38 @@ widget-platform-backend/
 
 ---
 
+# 🏗 Architecture
+
+```text
+                 Client Website
+                        │
+                        ▼
+               Spring Security
+                        │
+                        ▼
+              Rate Limiting Filter
+                        │
+                        ▼
+                 REST Controllers
+                        │
+                        ▼
+                  Service Layer
+        ┌───────────────┼──────────────┐
+        ▼               ▼              ▼
+ Widget Service   GeoEnrichment   Notification
+                        │
+                        ▼
+               Repository Layer
+                        │
+                        ▼
+                  PostgreSQL 17
+```
+
+---
+
 # ⚙ Configuration
 
-Example configuration:
+Example configuration
 
 ```yaml
 spring:
@@ -173,27 +200,37 @@ spring:
     show-sql: true
 ```
 
+> **Important**
+>
+> Never commit your real database password or API keys to GitHub.
+
 ---
 
-# ▶ Running the Project
+# 🚀 Getting Started
 
-## Clone
-
-```bash
-git clone https://github.com/alaminhossainrifat/flyrank-internship/tree/main/backend-ai-engineering/week08/widget-platform-backend
-```
-
-## Go to project
+## Clone Repository
 
 ```bash
-cd widget-platform-backend
+git clone https://github.com/alaminhossainrifat/flyrank-internship.git
 ```
+
+---
+
+## Navigate
+
+```bash
+cd flyrank-internship/backend-ai-engineering/week08/widget-platform-backend
+```
+
+---
 
 ## Build
 
 ```bash
 mvn clean install
 ```
+
+---
 
 ## Run
 
@@ -209,17 +246,40 @@ http://localhost:8080
 
 ---
 
+# 🌐 Demo Website
+
+A simple frontend demo is included.
+
+```
+test-client/index.html
+```
+
+This page demonstrates how a client website can embed widgets and submit customer data to the backend.
+
+---
+
 # 📡 REST API
+
+| Method | Endpoint | Description |
+|----------|------------------------------|--------------------------------|
+| POST | `/api/widgets` | Create Widget |
+| GET | `/api/widgets` | Get Widgets |
+| GET | `/api/widgets/{id}/config` | Widget Configuration |
+| POST | `/api/submissions` | Submit Lead |
+| GET | `/api/dashboard/widgets/{widgetId}/submissions` | Widget Submissions |
+| GET | `/api/dashboard/widgets/{widgetId}/stats` | Dashboard Analytics |
+
+---
 
 ## Create Widget
 
-**POST**
+### POST
 
 ```
 /api/widgets
 ```
 
-Example Body
+Request
 
 ```json
 {
@@ -229,76 +289,82 @@ Example Body
 }
 ```
 
----
+Example Response
 
-## Get Widgets
-
-**GET**
-
-```
-/api/widgets
-```
-
----
-
-## Widget Configuration
-
-**GET**
-
-```
-/api/widgets/{id}/config
+```json
+{
+  "id":"8e95b3...",
+  "name":"My First Signup Form",
+  "type":"signup",
+  "ownerId":"user-1",
+  "createdAt":"2026-08-02T14:10:30"
+}
 ```
 
 ---
 
 ## Submit Lead
 
-**POST**
+### POST
 
 ```
 /api/submissions?widgetId={widgetId}
 ```
 
-Example
+Request
 
 ```json
 {
-  "name": "John Doe",
-  "email": "john@example.com",
-  "phone": "017xxxxxxxx"
+  "name":"John Doe",
+  "email":"john@example.com",
+  "phone":"017xxxxxxxx"
 }
 ```
 
 ### Security Notes
 
-- 🛡 Requests are protected by **Rate Limiting**.
-- 🚫 Spam submissions are filtered using a **Honeypot** field.
-- 🌍 Client IP is enriched with approximate geographic information.
-- 📧 Email notifications are executed as safe side effects so failures never block successful submissions.
+- 🛡 Rate Limiting enabled
+- 🚫 Honeypot Spam Protection
+- 🌍 Automatic Geo-Enrichment
+- 📧 Safe Email Notification
+- ⚠ Payload Validation
+- ✅ Standard JSON Error Response
 
-> **Honeypot**
->
-> If the request contains a hidden field named `_bot_check`, the submission will be silently discarded as spam.
+### Honeypot
+
+If a request contains a hidden field named
+
+```
+_bot_check
+```
+
+the submission will be silently discarded as spam.
 
 ---
 
-# 🧩 Architecture
+## Dashboard Analytics
 
-```text
-Client
-   │
-   ▼
-Controller
-   │
-   ▼
-Service
-   │
-   ▼
-Repository
-   │
-   ▼
-PostgreSQL
+### GET
+
 ```
+/api/dashboard/widgets/{widgetId}/submissions
+```
+
+Returns all successful submissions for a widget.
+
+---
+
+### GET
+
+```
+/api/dashboard/widgets/{widgetId}/stats
+```
+
+Returns
+
+- Total submissions
+- Country-wise statistics
+- Basic analytics
 
 ---
 
@@ -306,45 +372,85 @@ PostgreSQL
 
 ## Current Status
 
-- ✅ Basic Spring Security
+- ✅ Spring Security
 - ✅ CORS Configuration
 - ✅ Rate Limiting
 - ✅ Honeypot Spam Protection
-- ✅ Safe Side Effects for Email Notifications
+- ✅ Payload Validation
+- ✅ Global Exception Handling
+- ✅ Safe Email Notifications
+- ✅ Geo-Enrichment
 - ✅ Development Configuration
 
 ## Upcoming
 
 - JWT Authentication
 - Role-Based Authorization
-- Request Validation Improvements
 - Audit Logging
+
+---
+
+# 📊 Development Progress
+
+| Module | Status |
+|-----------|------------|
+| PostgreSQL Integration | ✅ |
+| Entity Layer | ✅ |
+| Repository Layer | ✅ |
+| Service Layer | ✅ |
+| REST Controllers | ✅ |
+| Widget Delivery | ✅ |
+| Dashboard Analytics | ✅ |
+| Geo-Enrichment | ✅ |
+| Notification Service | ✅ |
+| Validation | ✅ |
+| CORS | ✅ |
+| Rate Limiting | ✅ |
+| Honeypot | ✅ |
+| JWT Authentication | ⏳ |
+| Docker | ⏳ |
+| CI/CD | ⏳ |
 
 ---
 
 # 🚧 Roadmap
 
-- [x] Project Setup
+- [x] Spring Boot Setup
 - [x] PostgreSQL Integration
-- [x] Entity Design
+- [x] Widget Entity
+- [x] Submission Entity
 - [x] Repository Layer
 - [x] Service Layer
 - [x] REST Controllers
+- [x] Widget Delivery
+- [x] Dashboard Analytics
 - [x] CORS Configuration
+- [x] Validation
 - [x] Rate Limiting
 - [x] Honeypot Spam Protection
+- [x] Geo-Enrichment
+- [x] Notification Service
 - [ ] JWT Authentication
-- [ ] Validation
-- [ ] Analytics Dashboard
-- [ ] Docker
+- [ ] Docker Support
 - [ ] CI/CD
 - [ ] Deployment
 
 ---
 
+# 💡 Future Improvements
+
+- OAuth2 Authentication
+- Dashboard Charts
+- Widget Themes
+- Email Templates
+- Docker Compose
+- Kubernetes Deployment
+
+---
+
 # 📜 License
 
-This project is licensed under the MIT License.
+This project is licensed under the **MIT License**.
 
 ---
 
@@ -352,8 +458,23 @@ This project is licensed under the MIT License.
 
 **Md. Al Amin Hossain Rifat**
 
-Full-stack Developer
+Computer Science & Engineering (CSE) Student
 
-Java • Spring Boot • PostgreSQL
+Backend Developer • Java • Spring Boot • PostgreSQL
 
-GitHub: https://github.com/alaminhossainrifat
+📍 Dhaka, Bangladesh
+
+
+💼 LinkedIn
+
+https://linkedin.com/in/alaminhossainrifat
+
+---
+
+<div align="center">
+
+## ⭐ If you found this project useful, please consider giving it a Star!
+
+Thank you for visiting this repository ❤️
+
+</div>
