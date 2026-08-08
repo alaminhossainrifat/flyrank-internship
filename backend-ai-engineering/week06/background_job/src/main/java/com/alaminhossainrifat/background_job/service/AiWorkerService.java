@@ -1,7 +1,9 @@
-package com.alaminhossainrifat.background_job.config;
+package com.alaminhossainrifat.background_job.service;
 
 import com.alaminhossainrifat.background_job.entity.AiJob;
 import com.alaminhossainrifat.background_job.repoaitory.AiJobRepository;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -17,29 +19,33 @@ public class AiWorkerService {
     }
 
     @Async("aiTaskExecutor")
+    @Retryable(retryFor = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 2000))
     public void processAiTask(UUID jobId) {
-        // Fetch the pending job from database
         AiJob job = repository.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
 
         try {
-            // Update status to processing
             job.setStatus("PROCESSING");
             repository.save(job);
 
-            // Simulate slow AI operation (e.g., A6 AI Call)
-            Thread.sleep(10000);
-            String aiResponse = "Mock AI Response: Operation Completed Successfully";
+            // Simulate slow operation
+            Thread.sleep(5000);
 
-            // Update status to completed
+            // Simulating a random failure for testing retries
+            if (Math.random() > 0.5) {
+                throw new RuntimeException("Temporary AI Service Unavailable");
+            }
+
+            String aiResponse = "Mock AI Response: Operation Completed Successfully";
             job.setStatus("COMPLETED");
             job.setResult(aiResponse);
             repository.save(job);
 
         } catch (Exception e) {
-            // Update status to failed if any error occurs
+            // Log the error state and rethrow to trigger Spring Retry
             job.setStatus("FAILED");
             job.setResult("Error: " + e.getMessage());
             repository.save(job);
+            throw new RuntimeException(e);
         }
     }
 }

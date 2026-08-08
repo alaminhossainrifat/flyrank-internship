@@ -17,6 +17,9 @@ public class AiJob {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(unique = true)
+    private String idempotencyKey;
+
     private String status;
 
     @Column(columnDefinition = "TEXT")
