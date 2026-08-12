@@ -1,9 +1,17 @@
 import { Handle, Position, type NodeProps } from 'reactflow';
 
 const PromptNode = ({ id, data }: NodeProps) => {
+  // Check if this node is currently executing
+  const isActive = data.isActive;
+
   return (
-    <div className="bg-white border-2 border-blue-500 rounded-lg p-4 shadow-lg w-72 relative">
-      {/* Target Handle: To receive connection from previous nodes */}
+    <div 
+      className={`bg-white border-2 rounded-lg p-4 shadow-lg w-72 relative transition-all duration-300 ${
+        isActive 
+          ? 'border-yellow-400 shadow-yellow-200 shadow-xl scale-105' 
+          : 'border-blue-500'
+      }`}
+    >
       <Handle 
         type="target" 
         position={Position.Top} 
@@ -11,19 +19,25 @@ const PromptNode = ({ id, data }: NodeProps) => {
       />
 
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-bold text-gray-700">
+        <label className="text-sm font-bold text-gray-700 flex justify-between items-center">
           {data.label || 'AI Decision Node'}
+          {isActive && (
+            <span className="flex w-3 h-3 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full w-3 h-3 bg-yellow-500"></span>
+            </span>
+          )}
         </label>
         <textarea
           className="w-full p-2 text-sm border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
           rows={3}
-          placeholder="Enter prompt (e.g., Is this a support request?)"
+          placeholder="Enter prompt..."
           value={data.prompt}
           onChange={(e) => data.onChange(id, e.target.value)}
+          disabled={isActive}
         />
       </div>
 
-      {/* YES Handle (Source) */}
       <Handle
         type="source"
         position={Position.Bottom}
@@ -35,7 +49,6 @@ const PromptNode = ({ id, data }: NodeProps) => {
         YES
       </div>
 
-      {/* NO Handle (Source) */}
       <Handle
         type="source"
         position={Position.Bottom}
