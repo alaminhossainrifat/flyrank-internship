@@ -13,9 +13,9 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import PromptNode from './nodes/PromptNode';
+import axios from 'axios';
 
 const WorkflowEditor = () => {
-  // Function to handle prompt text changes
   const updateNodePrompt = useCallback((id: string, newPrompt: string) => {
     setNodes((nds) =>
       nds.map((node) => {
@@ -30,7 +30,6 @@ const WorkflowEditor = () => {
     );
   }, []);
 
-  // Initial nodes setup using the custom PromptNode
   const initialNodes: Node[] = [
     {
       id: '1',
@@ -71,8 +70,8 @@ const WorkflowEditor = () => {
 
   const [nodes, setNodes] = useState<Node[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
+  const [isExecuting, setIsExecuting] = useState(false);
 
-  // Registering custom node types
   const nodeTypes = useMemo(() => ({ promptNode: PromptNode }), []);
 
   const onNodesChange = useCallback(
@@ -85,16 +84,63 @@ const WorkflowEditor = () => {
     []
   );
 
-  // Allow users to connect nodes manually
   const onConnect = useCallback(
     (connection: Connection) => setEdges((eds) => addEdge(connection, eds)),
     []
   );
 
+  /**
+   * Executes the workflow starting from Node 1
+   */
+  const runWorkflow = async () => {
+    setIsExecuting(true);
+    let currentNodeId: string | undefined = '1';
+
+    while (currentNodeId) {
+      const currentNode = nodes.find((n) => n.id === currentNodeId);
+      if (!currentNode) break;
+
+      try {
+        // Send the prompt to Spring Boot Backend
+        const response = await axios.post('http://localhost:8080/api/decision/evaluate', {
+          prompt: currentNode.data.prompt
+        });
+
+        const decision = response.data.decision;
+        alert(`Evaluating [${currentNode.data.label}]\nAI Decision: ${decision}`);
+
+        // Find the next edge based on YES/NO response
+        const nextEdge = edges.find(
+          (e) => e.source === currentNodeId &&
+                 ((decision === 'YES' && e.sourceHandle === 'yes') ||
+                  (decision === 'NO' && e.sourceHandle === 'no'))
+        );
+
+        // Move to the next node, or end if no connection exists
+        currentNodeId = nextEdge ? nextEdge.target : undefined;
+
+      } catch (error) {
+        console.error("API Error:", error);
+        alert("Failed to connect to the backend. Is Spring Boot running?");
+        break;
+      }
+    }
+    
+    alert("Workflow Execution Completed!");
+    setIsExecuting(false);
+  };
+
   return (
     <div className="flex flex-col w-full h-full bg-gray-50">
-      <div className="p-4 bg-white shadow-sm border-b">
+      <div className="flex items-center justify-between p-4 bg-white shadow-sm border-b z-10">
         <h1 className="text-xl font-bold text-gray-800">AI Decision Flow Editor</h1>
+        <button 
+          onClick={runWorkflow}
+          disabled={isExecuting}
+          className={`px-4 py-2 font-bold text-white rounded shadow ${isExecuting ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
+        >
+          {isExecuting ? 'Running...' : 'Run Workflow 🚀'}
+        </button>
       </div>
       
       <div className="flex-grow w-full h-full">
