@@ -1,41 +1,45 @@
 package com.alaminhossainrifat.ai_decision_flow.service;
 
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AiDecisionService {
 
-    private final ChatClient chatClient;
-
-    public AiDecisionService(ChatClient.Builder chatClientBuilder) {
-        // Configuring the ChatClient with a strict system prompt
-        this.chatClient = chatClientBuilder
-                .defaultSystem("You are a strict decision-making AI. " +
-                        "Evaluate the user's prompt and respond with EXACTLY one word: either 'YES' or 'NO'. " +
-                        "Do not add punctuation, explanations, or any other text.")
-                .build();
-    }
+    /*
+     * REAL OPENAI IMPLEMENTATION (Commented out to avoid 429 Insufficient Quota Error)
+     *
+     * private final ChatClient chatClient;
+     * public AiDecisionService(ChatClient.Builder chatClientBuilder) {
+     *     this.chatClient = chatClientBuilder.defaultSystem("...").build();
+     * }
+     *
+     * public String evaluatePromptWithRealAI(String userPrompt) {
+     *     return this.chatClient.prompt().user(userPrompt).call().content().trim().toUpperCase();
+     * }
+     */
 
     /**
-     * Sends the prompt to OpenAI and retrieves a YES/NO response.
+     * MOCK IMPLEMENTATION: Evaluates the prompt locally to bypass API costs.
+     * Returns YES if the prompt contains support-related keywords, otherwise NO.
      */
     public String evaluatePrompt(String userPrompt) {
-        String response = this.chatClient.prompt()
-                .user(userPrompt)
-                .call()
-                .content();
-
-        // Cleaning the response to ensure no hidden spaces or characters exist
-        if (response != null) {
-            response = response.trim().toUpperCase();
+        if (userPrompt == null || userPrompt.trim().isEmpty()) {
+            return "NO";
         }
 
-        // Fallback safety check
-        if (!"YES".equals(response) && !"NO".equals(response)) {
-            return "NO"; // Default fallback
+        String lowerPrompt = userPrompt.toLowerCase();
+
+        // Mock logic: Assuming support requests contain these keywords
+        if (lowerPrompt.contains("support") ||
+                lowerPrompt.contains("help") ||
+                lowerPrompt.contains("issue") ||
+                lowerPrompt.contains("error") ||
+                lowerPrompt.contains("broken") ||
+                lowerPrompt.contains("won't turn on")) {
+            return "YES";
         }
 
-        return response;
+        // Default to NO for sales, general questions, etc.
+        return "NO";
     }
 }
