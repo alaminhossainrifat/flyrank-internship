@@ -8,14 +8,25 @@ import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.chat.completions.ChatCompletionMessageParam;
 import com.openai.models.chat.completions.ChatCompletionSystemMessageParam;
 import com.openai.models.chat.completions.ChatCompletionUserMessageParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.FileWriter;
+
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class LlmService {
+
+    private static final Logger log = LoggerFactory.getLogger(LlmService.class);
 
     @Autowired
     private OpenAIClient client;
@@ -29,39 +40,55 @@ public class LlmService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SupportResponse callLlm(String userText) throws Exception {
-        String systemPrompt = promptService.loadPrompt("triage-v1");
+        String promptVersion = "triage-v1";
+        String systemPrompt = promptService.loadPrompt(promptVersion);
 
-        String rawResponse = sendRequest(systemPrompt, userText);
+        long startTime = System.currentTimeMillis();
+        int repairsNeeded = 0;
 
+        ChatCompletion completion = sendRequest(systemPrompt, userText);
+        String rawResponse = completion.choices().get(0).message().content().orElse("{}");
+
+        SupportResponse response;
         try {
-            return parseAndValidate(rawResponse);
+            response = parseAndValidate(rawResponse);
         } catch (Exception e) {
+            repairsNeeded++;
+            log.warn("Parsing/validation failed. Triggering repair retry for error: {}", e.getMessage());
+
             String repairPrompt = systemPrompt + "\nYour previous answer was rejected: " + e.getMessage() + ". Return only corrected JSON matching the schema.";
-            String repairedResponse = sendRequest(repairPrompt, userText);
-            return parseAndValidate(repairedResponse);
+            completion = sendRequest(repairPrompt, userText);
+            rawResponse = completion.choices().get(0).message().content().orElse("{}");
+
+            try {
+                response = parseAndValidate(rawResponse);
+            } catch (Exception ex) {
+                logQuarantine(userText, rawResponse, ex.getMessage(), promptVersion);
+                throw new IllegalArgumentException("Validation failed after repair: " + ex.getMessage());
+            }
         }
+
+        long duration = System.currentTimeMillis() - startTime;
+        logCost(promptVersion, completion, duration, repairsNeeded);
+
+        return response;
     }
 
-    private String sendRequest(String systemPrompt, String userText) {
+    private ChatCompletion sendRequest(String systemPrompt, String userText) {
         ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
                 .model(modelName)
                 .messages(List.of(
                         ChatCompletionMessageParam.ofSystem(
-                                ChatCompletionSystemMessageParam.builder()
-                                        .content(systemPrompt)
-                                        .build()
+                                ChatCompletionSystemMessageParam.builder().content(systemPrompt).build()
                         ),
                         ChatCompletionMessageParam.ofUser(
-                                ChatCompletionUserMessageParam.builder()
-                                        .content(userText)
-                                        .build()
+                                ChatCompletionUserMessageParam.builder().content(userText).build()
                         )
                 ))
                 .temperature(0.0)
                 .build();
 
-        ChatCompletion completion = client.chat().completions().create(params);
-        return completion.choices().get(0).message().content().orElse("{}");
+        return client.chat().completions().create(params);
     }
 
     private SupportResponse parseAndValidate(String jsonStr) throws Exception {
@@ -79,5 +106,32 @@ public class LlmService {
         }
 
         return response;
+    }
+
+    private void logCost(String promptVersion, ChatCompletion completion, long durationMs, int repairsNeeded) {
+        long promptTokens = completion.usage().map(u -> u.promptTokens()).orElse(0L);
+        long completionTokens = completion.usage().map(u -> u.completionTokens()).orElse(0L);
+
+        log.info("COST LOG | version={} | model={} | prompt_tokens={} | completion_tokens={} | duration_ms={} | repairs={}",
+                promptVersion, modelName, promptTokens, completionTokens, durationMs, repairsNeeded);
+    }
+
+    private void logQuarantine(String input, String rawOutput, String error, String version) {
+        try {
+            Files.createDirectories(Paths.get("logs"));
+            try (FileWriter fw = new FileWriter("logs/quarantine.jsonl", true);
+                 PrintWriter pw = new PrintWriter(fw)) {
+
+                Map<String, String> logMap = new HashMap<>();
+                logMap.put("version", version);
+                logMap.put("input", input);
+                logMap.put("rawOutput", rawOutput);
+                logMap.put("error", error);
+
+                pw.println(objectMapper.writeValueAsString(logMap));
+            }
+        } catch (Exception e) {
+            log.error("Failed to write to quarantine log", e);
+        }
     }
 }
