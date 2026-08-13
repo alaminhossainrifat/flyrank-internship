@@ -2,7 +2,7 @@ package com.alaminhossianrifat.llm_api.controller;
 
 import com.alaminhossianrifat.llm_api.dto.SupportRequest;
 import com.alaminhossianrifat.llm_api.dto.SupportResponse;
-import com.alaminhossianrifat.llm_api.service.PromptService;
+import com.alaminhossianrifat.llm_api.service.LlmService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,23 +17,21 @@ public class SupportController {
     private String llmStub;
 
     @Autowired
-    private PromptService promptService;
+    private LlmService llmService;
 
     @PostMapping("/triage")
     public ResponseEntity<?> triageMessage(@Valid @RequestBody SupportRequest request) {
         try {
-            String prompt = promptService.loadPrompt("triage-v1");
-            System.out.println(prompt);
+            if ("1".equals(llmStub)) {
+                SupportResponse stubResponse = new SupportResponse("billing", "normal", 0.95, "Stub response for testing.");
+                return ResponseEntity.ok(stubResponse);
+            }
+
+            SupportResponse liveResponse = llmService.callLlm(request.getText());
+            return ResponseEntity.ok(liveResponse);
+
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error loading prompt");
+            return ResponseEntity.status(422).body("Error processing request: " + e.getMessage());
         }
-
-        if ("1".equals(llmStub)) {
-            SupportResponse stubResponse = new SupportResponse("billing", "normal", 0.95, "Stub response for testing.");
-            return ResponseEntity.ok(stubResponse);
-        }
-
-        SupportResponse liveResponse = new SupportResponse("other", "low", 0.50, "Live model response pending.");
-        return ResponseEntity.ok(liveResponse);
     }
 }
