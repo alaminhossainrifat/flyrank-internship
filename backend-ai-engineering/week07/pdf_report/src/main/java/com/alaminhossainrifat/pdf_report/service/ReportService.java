@@ -54,6 +54,7 @@ public class ReportService {
             job.setStatus(ReportJob.JobStatus.COMPLETED);
         } catch (Exception e) {
             job.setStatus(ReportJob.JobStatus.FAILED);
+            job.setFailureReason(e.getMessage());
         }
 
         job.setCompletedAt(LocalDateTime.now());
