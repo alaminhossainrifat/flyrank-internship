@@ -7,6 +7,7 @@ import com.alaminhossainrifat.pdf_report.util.PdfGeneratorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -68,5 +69,10 @@ public class ReportService {
 
     public List<ReportJob> getAllJobs() {
         return reportJobRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    @Scheduled(cron = "${report.schedule.cron}")
+    public void scheduledReportGeneration() {
+        createJob();
     }
 }
