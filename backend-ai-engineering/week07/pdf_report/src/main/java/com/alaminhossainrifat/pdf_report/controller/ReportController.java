@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -55,5 +56,11 @@ public class ReportController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
                 .body(resource);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ReportJob>> getAllReports() {
+        List<ReportJob> jobs = reportService.getAllJobs();
+        return ResponseEntity.ok(jobs);
     }
 }

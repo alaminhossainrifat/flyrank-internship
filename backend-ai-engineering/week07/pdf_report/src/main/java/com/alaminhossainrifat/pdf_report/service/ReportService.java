@@ -64,4 +64,8 @@ public class ReportService {
         return reportJobRepository.findByJobId(jobId)
                 .orElseThrow(() -> new IllegalStateException("Job not found: " + jobId));
     }
+
+    public List<ReportJob> getAllJobs() {
+        return reportJobRepository.findAllByOrderByCreatedAtDesc();
+    }
 }
