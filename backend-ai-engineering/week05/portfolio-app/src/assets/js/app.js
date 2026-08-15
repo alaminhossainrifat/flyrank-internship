@@ -304,8 +304,9 @@ $(function() {
 		var th = $(this);
 		$.ajax({
 			type: "POST",
-			url: "mail.php", //Change
-			data: th.serialize()
+			url: "https://formspree.io/f/xppajzdy", //Change
+			data: th.serialize(),
+      dataType: "json"
 		}).done(function() {
       $('.contact').find('.form').addClass('is-hidden');
       $('.contact').find('.form__reply').addClass('is-visible');
