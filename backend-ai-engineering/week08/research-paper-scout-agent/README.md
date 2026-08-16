@@ -5,6 +5,9 @@ An AI agent that reads uploaded academic papers and produces a structured, conci
 **Built for:** FlyRank AI Internship — General AI Fluency Track (FL-06 → FL-09)
 **Author:** Md. Al Amin Hossain Rifat
 
+🎥 **Demo Video:** [https://youtu.be/uceVhul_02k](https://youtu.be/uceVhul_02k)
+
+
 ---
 
 ## 1. What It Does & Who It's For
